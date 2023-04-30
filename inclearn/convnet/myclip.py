@@ -8,7 +8,12 @@ __all__ = ['CLIP', 'myclip']
 
 
 class CLIP(nn.Module):
+    """
+    
+    github: https://github.com/openai/CLIP
+    Available Models : https://github.com/mlfoundations/open_clip#pretrained-model-interface
 
+    """
     def __init__(
         self,
         weight_name,

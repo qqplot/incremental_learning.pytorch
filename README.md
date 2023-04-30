@@ -42,9 +42,18 @@ setting of 50 steps:
 ```bash
 python3 -minclearn --options options/podnet/podnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
     --initial-increment 50 --increment 1 --fixed-memory \
-    --device <GPU_ID> --label podnet_cnn_cifar100_50steps \
-    --data-path <PATH/TO/DATA>
+    --device 0 --label podnet_cnn_cifar100_50steps \
+    --data-path ./data/cifar100/
 ```
+
+# For MLVU
+```bash
+python3 -minclearn --options options/cpodnet/cpodnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
+    --initial-increment 50 --increment 1 --fixed-memory \
+    --device 0 --label cpodnet_cnn_cifar100_50steps \
+    --data-path ./data/cifar100/
+```
+
 
 Likewise, for ImageNet100:
 
