@@ -8,7 +8,19 @@ import warnings
 import numpy as np
 from torchvision import datasets, transforms
 
+from PIL import Image
+try:
+    from torchvision.transforms import InterpolationMode
+    BICUBIC = InterpolationMode.BICUBIC
+except ImportError:
+    BICUBIC = Image.BICUBIC
+
+
+
+
 logger = logging.getLogger(__name__)
+
+
 
 
 class DataHandler:
@@ -36,10 +48,31 @@ class iCIFAR10(DataHandler):
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
     ]
 
-    def set_custom_transforms(self, transforms):
-        if not transforms.get("color_jitter"):
+    def set_custom_transforms(self, transforms_):
+        if not transforms_.get("color_jitter"):
             logger.info("Not using color jitter.")
             self.train_transforms.pop(-1)
+        if transforms_.get("clip"):
+            logger.info("using clip transform.")
+
+            self.open_image = True
+            # Define the CLIP transformation
+            
+            clip_transform = transforms.Compose([
+                transforms.Resize(224, interpolation=BICUBIC),
+                transforms.CenterCrop(224),
+                # lambda image: image.convert("RGB"),
+            ])
+            
+            # Replace train_transforms and common_transforms with the new transforms object
+            self.train_transforms = [clip_transform]
+            self.test_transforms = [clip_transform]
+            self.common_transforms = [
+                # transforms.ToPILImage(),
+                transforms.ToTensor(),
+                transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
+            ]
+
 
 
 class iCIFAR100(iCIFAR10):

@@ -97,6 +97,7 @@ class Classifier(nn.Module):
         if self.normalize:
             features = F.normalize(features, dim=1, p=2)
 
+        features = features.to(weights.dtype)
         logits = F.linear(features, weights, bias=self.bias)
         return {"logits": logits}
 
