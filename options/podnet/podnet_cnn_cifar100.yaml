@@ -1,7 +1,7 @@
 dataset: cifar100
 
 model: podnet
-convnet: rebuffi
+convnet: resnet18
 
 fixed_memory: true
 memory_size: 2000
@@ -40,7 +40,12 @@ finetuning_config:
   scaling: null
 
 # Cosine Scheduling (CS)
-scheduling: cosine
+# scheduling: cosine
+
+# Multi step LR Scheduler
+scheduling:
+  type: step
+  epochs: [80,120]
 
 # Misc
 epochs: 160
