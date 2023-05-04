@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 def train(args):
-    logger_lib.set_logging_level(args["logging"])
+    start_date = utils.get_date()
+
+    logger_lib.set_logging_level(args["logging"], args["label"], start_date)
 
     autolabel = _set_up_options(args)
     if args["autolabel"]:
@@ -40,8 +42,6 @@ def train(args):
 
     seed_list = copy.deepcopy(args["seed"])
     device = copy.deepcopy(args["device"])
-
-    start_date = utils.get_date()
 
     orders = copy.deepcopy(args["order"])
     del args["order"]
@@ -190,7 +190,7 @@ def _train(args, start_date, class_order, run_id):
     )
     if args["label"] is not None:
         results_utils.save_results(
-            results, args["label"], args["model"], start_date, run_id, args["seed"]
+            results, args["label"], args["model"], start_date, run_id, args["seed"], args
         )
 
     del model
@@ -248,7 +248,7 @@ def _after_task(config, model, inc_dataset, run_id, task_id, results_folder):
 
 def _set_results(config, start_date):
     if config["label"]:
-        results_folder = results_utils.get_save_folder(config["model"], start_date, config["label"])
+        results_folder = results_utils.get_save_folder(config["model"], start_date, config["label"], config)
     else:
         results_folder = None
 
