@@ -5,3 +5,7 @@ hyperexps/*
 */.ipynb_checkpoints/*
 notebooks/
 **/*.pyc
+
+
+/logs
+/data

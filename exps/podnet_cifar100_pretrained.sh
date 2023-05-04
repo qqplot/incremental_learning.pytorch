@@ -1,50 +1,39 @@
-python3 -m inclearn --options options/podnet/podnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 10 --fixed-memory \
-    --device 9 --label podnet_cnn_cifar100_5steps \
-    --data-path data
+device_id=2
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 10 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_5steps \
-    --data-path data
+# method=nme
 
-python3 -m inclearn --options options/podnet/podnet_cnn_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 10 --fixed-memory \
-    --device 9 --label podnet_cnn_cifar100_5steps \
-    --data-path data
+# increment=10
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 10 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_5steps \
-    --data-path data
+# increment=5
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 5 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_10steps \
-    --data-path data
+# increment=2
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 5 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_10steps \
-    --data-path data
+# increment=1
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+# python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 2 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_25steps \
-    --data-path data
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 2 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_25steps \
-    --data-path data
+method=cnn
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 1 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_50steps \
-    --data-path data
+increment=10
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
 
-python3 -m inclearn --options options/podnet/podnet_nme_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml \
-    --initial-increment 50 --increment 1 --fixed-memory \
-    --device 9 --label podnet_nme_cifar100_50steps \
-    --data-path data
+increment=5
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+
+increment=2
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+
+increment=1
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_pretrained.yaml options/data/cifar100_3orders.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --label cifar_${method}_inc_${increment} --data-path data --save-model task
 
