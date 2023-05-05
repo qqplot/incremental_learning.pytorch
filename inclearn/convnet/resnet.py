@@ -109,9 +109,9 @@ class ResNet(nn.Module):
         block,
         layers,
         zero_init_residual=True,
-        nf=16,
+        nf=64,
         last_relu=False,
-        initial_kernel=3,
+        initial_kernel=7,
         **kwargs
     ):
         super(ResNet, self).__init__()
