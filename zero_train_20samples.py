@@ -44,7 +44,7 @@ def get_zero_acc(model_name):
     print("Obtaining feature means...")
     feature_means = np.zeros((100,out_dim))
     for class_idx in class_order:
-        class_loader = DataLoader(cifar100_train, shuffle=False, batch_size=500, 
+        class_loader = DataLoader(cifar100_train, shuffle=False, batch_size=20, 
                                 sampler=SubsetRandomSampler(train_list[class_idx]))
         with torch.no_grad():
             for X, y in class_loader:
@@ -52,6 +52,7 @@ def get_zero_acc(model_name):
 
                 features = model.encode_image(X).cpu().numpy()
                 feature_means[class_idx] = features.mean(axis=0)
+                break
 
             torch.cuda.empty_cache()
     
@@ -108,7 +109,7 @@ def get_average_accuracy(acc,inc):
 
 
 if __name__ == '__main__':
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = "cuda:9" if torch.cuda.is_available() else "cpu"
     print(f"Using {device} device")
 
     model_name = sys.argv[1]

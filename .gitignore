@@ -10,3 +10,4 @@ notebooks/
 /logs
 /data
 .vscode
+.ipynb_checkpoints

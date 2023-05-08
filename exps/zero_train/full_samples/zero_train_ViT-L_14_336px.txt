@@ -1,0 +1,19 @@
+Using cuda:0 device
+Using ViT-L/14@336px model
+
+Features dimension is 768.
+Obtaining feature means...
+Obtaining test accuracy...
+
+Incremental Class Number : 10
+    Average Accuracy : 0.813670701058201
+    Last Accuracy    : 0.7911000000000001
+Incremental Class Number : 5
+    Average Accuracy : 0.8125284436745667
+    Last Accuracy    : 0.7911000000000001
+Incremental Class Number : 2
+    Average Accuracy : 0.8125961901149068
+    Last Accuracy    : 0.7911000000000001
+Incremental Class Number : 1
+    Average Accuracy : 0.812732148465276
+    Last Accuracy    : 0.7911000000000001

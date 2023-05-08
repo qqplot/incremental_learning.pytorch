@@ -1,0 +1,19 @@
+Using cuda:0 device
+Using RN50x16 model
+
+Features dimension is 768.
+Obtaining feature means...
+Obtaining test accuracy...
+
+Incremental Class Number : 10
+    Average Accuracy : 0.5972296296296297
+    Last Accuracy    : 0.5678
+Incremental Class Number : 5
+    Average Accuracy : 0.5961738315848083
+    Last Accuracy    : 0.5678
+Incremental Class Number : 2
+    Average Accuracy : 0.5962433854119309
+    Last Accuracy    : 0.5678
+Incremental Class Number : 1
+    Average Accuracy : 0.5962210709334466
+    Last Accuracy    : 0.5678

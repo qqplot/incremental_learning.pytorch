@@ -1,0 +1,19 @@
+Using cuda:0 device
+Using ViT-B/16 model
+
+Features dimension is 512.
+Obtaining feature means...
+Obtaining test accuracy...
+
+Incremental Class Number : 10
+    Average Accuracy : 0.7300465608465608
+    Last Accuracy    : 0.6989000000000002
+Incremental Class Number : 5
+    Average Accuracy : 0.7288437023776175
+    Last Accuracy    : 0.6989000000000002
+Incremental Class Number : 2
+    Average Accuracy : 0.7288021745004591
+    Last Accuracy    : 0.6989000000000002
+Incremental Class Number : 1
+    Average Accuracy : 0.7288913113897957
+    Last Accuracy    : 0.6989000000000002
