@@ -248,7 +248,10 @@ def resnet50(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        state_dict = model_zoo.load_url(model_urls['resnet50'])
+        del state_dict["fc.weight"]
+        del state_dict["fc.bias"]
+        model.load_state_dict(state_dict)
     return model
 
 

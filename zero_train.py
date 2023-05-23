@@ -10,10 +10,28 @@ import sys
 import tqdm
 
 
+from inclearn.convnet import resnet
+
+
 
 def get_zero_acc(model_name):
-    model, preprocess = clip.load(model_name, device=device)
-    out_dim = model.text_projection.shape[1]
+    if model_name == 'resnet18':
+        model = resnet.resnet18(pretrained=True)
+        preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+        out_dim = model.out_dim
+    elif model_name == 'resnet50':
+        model = resnet.resnet50(pretrained=True)
+        preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+        out_dim = model.out_dim
+    else:
+        model, preprocess = clip.load(model_name, device=device)
+        out_dim = model.text_projection.shape[1]
 
     print("Features dimension is {}.".format(out_dim))
 
@@ -50,7 +68,10 @@ def get_zero_acc(model_name):
             for X, y in class_loader:
                 X, y = X.to(device), y.to(device)
 
-                features = model.encode_image(X).cpu().numpy()
+                if model_name in ['resnet18', 'resnet50']:
+                    features = model(X)["features"].cpu().numpy()
+                else:
+                    features = model.encode_image(X).cpu().numpy()
                 feature_means[class_idx] = features.mean(axis=0)
 
             torch.cuda.empty_cache()
@@ -69,7 +90,10 @@ def get_zero_acc(model_name):
             for X, y in class_loader:
                 X, y = X.to(device), y.numpy()
 
-                features = model.encode_image(X).cpu().numpy()
+                if model_name in ['resnet18', 'resnet50']:
+                    features = model(X)["features"].cpu().numpy()
+                else:
+                    features = model.encode_image(X).cpu().numpy()
 
                 dists = -2 * (features@feature_means.T) + np.power(features, 2).sum(axis=1, keepdims=True) + np.power(feature_means, 2).sum(axis=1, keepdims=True).T
 
