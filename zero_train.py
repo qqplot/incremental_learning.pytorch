@@ -14,7 +14,7 @@ from inclearn.convnet import resnet
 
 
 
-def get_zero_acc(model_name):
+def get_zero_acc(model_name, n_samples):
     if model_name == 'resnet18':
         model = resnet.resnet18(pretrained=True)
         preprocess = transforms.Compose([
@@ -29,6 +29,20 @@ def get_zero_acc(model_name):
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         ])
         out_dim = model.out_dim
+    elif model_name == 'resnet18_fc':
+        model = torchvision.models.resnet18(pretrained=True)
+        preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+        out_dim = model.fc.out_features
+    elif model_name == 'resnet50_fc':
+        model = torchvision.models.resnet50(pretrained=True)
+        preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+        out_dim = model.fc.out_features
     else:
         model, preprocess = clip.load(model_name, device=device)
         out_dim = model.text_projection.shape[1]
@@ -62,7 +76,7 @@ def get_zero_acc(model_name):
     print("Obtaining feature means...")
     feature_means = np.zeros((100,out_dim))
     for class_idx in class_order:
-        class_loader = DataLoader(cifar100_train, shuffle=False, batch_size=500, 
+        class_loader = DataLoader(cifar100_train, shuffle=False, batch_size=n_samples, 
                                 sampler=SubsetRandomSampler(train_list[class_idx]))
         with torch.no_grad():
             for X, y in class_loader:
@@ -70,6 +84,8 @@ def get_zero_acc(model_name):
 
                 if model_name in ['resnet18', 'resnet50']:
                     features = model(X)["features"].cpu().numpy()
+                elif model_name in ['resnet18_fc', 'resnet50_fc']:
+                    features = model(X).cpu().numpy()
                 else:
                     features = model.encode_image(X).cpu().numpy()
                 feature_means[class_idx] = features.mean(axis=0)
@@ -79,7 +95,7 @@ def get_zero_acc(model_name):
     print("Obtaining test accuracy...\n")
     class_accs = []
     
-    MAX = 10000
+    MAX = 100000000000000
 
     class_nums = np.arange(50,101,1)
 
@@ -92,6 +108,8 @@ def get_zero_acc(model_name):
 
                 if model_name in ['resnet18', 'resnet50']:
                     features = model(X)["features"].cpu().numpy()
+                elif model_name in ['resnet18_fc', 'resnet50_fc']:
+                    features = model(X).cpu().numpy()
                 else:
                     features = model.encode_image(X).cpu().numpy()
 
@@ -111,6 +129,8 @@ def get_zero_acc(model_name):
     
     class_accs_np = np.array(class_accs)
 
+    final = [model_name]
+
     for inc in [10,5,2,1]:
         inc_acc = []
         for i in np.arange(50,101,inc):
@@ -119,6 +139,13 @@ def get_zero_acc(model_name):
         print("Incremental Class Number :", inc)
         print("    Average Accuracy :", np.mean(inc_acc))
         print("    Last Accuracy    :", inc_acc[-1])
+        
+        if inc == 10: final.append(inc_acc[-1] * 100)
+        final.append(np.mean(inc_acc) * 100)
+
+    print()
+    for item in final:
+        print(item, end=",")
 
 
 def get_average_accuracy(acc,inc):
@@ -136,6 +163,8 @@ if __name__ == '__main__':
     print(f"Using {device} device")
 
     model_name = sys.argv[1]
+    n_samples = int(sys.argv[2]) # 500 for full_samples, 20 for 20_samples
 
-    print(f"Using {model_name} model\n")
-    get_zero_acc(model_name)
+    print(f"Using {model_name} model")
+    print(f"Using {n_samples} samples\n")
+    get_zero_acc(model_name, n_samples)

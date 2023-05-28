@@ -1,3 +1,5 @@
+gpu_id=9
+
 # network=RN50
 # python zero_train_20samples.py ${network} | tee exps/zero_train/zero_train_${network}.txt
 # network=RN101
@@ -23,6 +25,15 @@
 
 
 network=resnet18
-python zero_train.py ${network} | tee exps/zero_train/zero_train_${network}.txt
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 500 | tee exps/zero_train/full_samples/zero_train_${network}.txt
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 20 | tee exps/zero_train/20_samples/zero_train_${network}.txt
 network=resnet50
-python zero_train.py ${network} | tee exps/zero_train/zero_train_${network}.txt
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 500 | tee exps/zero_train/full_samples/zero_train_${network}.txt
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 20 | tee exps/zero_train/20_samples/zero_train_${network}.txt
+
+network=resnet18_fc
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 500 | tee exps/zero_train/full_samples/zero_train_${network}.txt
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 20 | tee exps/zero_train/20_samples/zero_train_${network}.txt
+network=resnet50_fc
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 500 | tee exps/zero_train/full_samples/zero_train_${network}.txt
+CUDA_VISIBLE_DEVICES=${gpu_id} python zero_train.py ${network} 20 | tee exps/zero_train/20_samples/zero_train_${network}.txt
