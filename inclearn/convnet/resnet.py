@@ -109,9 +109,9 @@ class ResNet(nn.Module):
         block,
         layers,
         zero_init_residual=True,
-        nf=16,
+        nf=64,
         last_relu=False,
-        initial_kernel=3,
+        initial_kernel=7,
         **kwargs
     ):
         super(ResNet, self).__init__()
@@ -248,7 +248,10 @@ def resnet50(pretrained=False, **kwargs):
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        state_dict = model_zoo.load_url(model_urls['resnet50'])
+        del state_dict["fc.weight"]
+        del state_dict["fc.bias"]
+        model.load_state_dict(state_dict)
     return model
 
 

@@ -5,3 +5,9 @@ hyperexps/*
 */.ipynb_checkpoints/*
 notebooks/
 **/*.pyc
+
+
+/logs
+/data
+.vscode
+.ipynb_checkpoints

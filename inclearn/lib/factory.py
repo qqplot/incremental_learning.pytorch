@@ -55,9 +55,10 @@ def get_convnet(convnet_type, **kwargs):
         return vgg.vgg19_bn(**kwargs)
     elif convnet_type == "myclip":
         return myclip.myclip(**kwargs)
-
-
-    raise NotImplementedError("Unknwon convnet type {}.".format(convnet_type))
+    elif convnet_type == "resnet50":
+        return resnet.resnet50(**kwargs)
+    else:
+        raise NotImplementedError("Unknwon convnet type {}.".format(convnet_type))
 
 
 def get_model(args):

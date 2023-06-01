@@ -1,0 +1,24 @@
+Using cuda:0 device
+Using resnet18 model
+Using 500 samples
+
+Features dimension is 512.
+Loading pretrained network
+Features dimension is 512.
+Obtaining feature means...
+Obtaining test accuracy...
+
+Incremental Class Number : 10
+    Average Accuracy : 0.20062962962962963
+    Last Accuracy    : 0.17290000000000005
+Incremental Class Number : 5
+    Average Accuracy : 0.19968144831370277
+    Last Accuracy    : 0.17290000000000005
+Incremental Class Number : 2
+    Average Accuracy : 0.19959054297154963
+    Last Accuracy    : 0.17290000000000005
+Incremental Class Number : 1
+    Average Accuracy : 0.1994735818634481
+    Last Accuracy    : 0.17290000000000005
+
+resnet18,17.290000000000006,20.062962962962963,19.968144831370278,19.959054297154964,19.94735818634481,

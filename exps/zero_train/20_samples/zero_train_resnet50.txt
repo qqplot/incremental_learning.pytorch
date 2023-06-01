@@ -1,0 +1,23 @@
+Using cuda:0 device
+Using resnet50 model
+Using 20 samples
+
+Features dimension is 2048.
+Features dimension is 2048.
+Obtaining feature means...
+Obtaining test accuracy...
+
+Incremental Class Number : 10
+    Average Accuracy : 0.05600383597883598
+    Last Accuracy    : 0.04569999999999999
+Incremental Class Number : 5
+    Average Accuracy : 0.05527847076306125
+    Last Accuracy    : 0.04569999999999999
+Incremental Class Number : 2
+    Average Accuracy : 0.05536303590403007
+    Last Accuracy    : 0.04569999999999999
+Incremental Class Number : 1
+    Average Accuracy : 0.055233256733061925
+    Last Accuracy    : 0.04569999999999999
+
+resnet50,4.569999999999999,5.600383597883598,5.527847076306125,5.536303590403007,5.523325673306193,
