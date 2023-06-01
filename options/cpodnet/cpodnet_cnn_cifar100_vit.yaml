@@ -3,7 +3,7 @@ dataset: cifar100
 model: icarl
 convnet: myclip
 convnet_config:
-  clip_weight_name: RN50
+  clip_weight_name: ViT-B/32
   clip_trainable: False
 
 # lr: 2.
