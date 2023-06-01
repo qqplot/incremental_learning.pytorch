@@ -54,7 +54,7 @@ def get_convnet(convnet_type, **kwargs):
     elif convnet_type == "vgg19":
         return vgg.vgg19_bn(**kwargs)
     elif convnet_type == "myclip":
-        return myclip.myclip18(**kwargs)
+        return myclip.myclip(**kwargs)
 
 
     raise NotImplementedError("Unknwon convnet type {}.".format(convnet_type))

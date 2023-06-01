@@ -48,11 +48,33 @@ python3 -minclearn --options options/podnet/podnet_cnn_cifar100.yaml options/dat
 
 # For MLVU
 ```bash
-python3 -minclearn --options options/cpodnet/cpodnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
+python3 -minclearn --options options/cpodnet/icarl_cifar100.yaml options/data/cifar100_3orders.yaml \
     --initial-increment 50 --increment 1 --fixed-memory \
+    --device 0 --label icarl_cifar100_50steps \
+    --data-path ./data/cifar100/
+```
+
+```bash
+python3 -minclearn --options options/cpodnet/cpodnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
+    --initial-increment 50 --increment 2 --fixed-memory \
     --device 0 --label cpodnet_cnn_cifar100_50steps \
     --data-path ./data/cifar100/
 ```
+
+```bash
+python3 -minclearn --options options/cpodnet/cpodnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
+    --initial-increment 50 --increment 5 --fixed-memory \
+    --device 0 --label cpodnet_cnn_cifar100_50steps \
+    --data-path ./data/cifar100/
+```
+
+```bash
+python3 -minclearn --options options/cpodnet/cpodnet_cnn_cifar100.yaml options/data/cifar100_3orders.yaml \
+    --initial-increment 50 --increment 10 --fixed-memory \
+    --device 0 --label cpodnet_cnn_cifar100_50steps \
+    --data-path ./data/cifar100/
+```
+
 
 
 Likewise, for ImageNet100:

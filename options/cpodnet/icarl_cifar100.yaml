@@ -1,13 +1,22 @@
 dataset: cifar100
 
 model: icarl
-convnet: rebuffi
+# convnet: rebuffi
+convnet: myclip
+convnet_config:
+  clip_weight_name: RN50
+  clip_trainable: True
 
-lr: 2.
-weight_decay: 0.00005
-scheduling:
-  - 49
-  - 63
-lr_decay: 0.2
+lr: 0.1
+weight_decay: 0.0005
+# scheduling:
+#   - 49
+#   - 63
+# lr_decay: 0.2
 optimizer: sgd
-epochs: 70
+epochs: 10
+
+
+dataset_transforms:
+  clip: true
+
