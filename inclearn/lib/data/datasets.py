@@ -60,7 +60,7 @@ class iCIFAR10(DataHandler):
             
             clip_transform = transforms.Compose([
                 transforms.Resize(224, interpolation=BICUBIC),
-                transforms.CenterCrop(224),
+                transforms.CenterCrop(size=(224, 224)),
                 # lambda image: image.convert("RGB"),
             ])
             

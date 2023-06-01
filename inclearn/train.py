@@ -63,6 +63,8 @@ def train(args):
         for avg_inc_acc, last_acc, forgetting in _train(args, start_date, orders[i], i):
             yield avg_inc_acc, last_acc, forgetting, False
 
+
+
         avg_inc_accs.append(avg_inc_acc)
         last_accs.append(last_acc)
         forgettings.append(forgetting)
@@ -101,6 +103,11 @@ def _train(args, start_date, class_order, run_id):
         task_info, train_loader, val_loader, test_loader = inc_dataset.new_task(memory, memory_val)
         if task_info["task"] == args["max_task"]:
             break
+
+        # Check the state of the image encoder
+        # for name, param in model._network.named_parameters():            
+        #     print(f'Parameter name: {name}')
+        #     print(f'Is trainable: {param.requires_grad}')
 
         model.set_task_info(task_info)
 
