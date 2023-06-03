@@ -12,5 +12,6 @@ increment=10
 CUDA_VISIBLE_DEVICES=${gpu_id} python3 -m inclearn \
     --options options/pretrained/pretrained_${backbone}_cifar100.yaml options/data/cifar100_1order.yaml \
     --initial-increment 50 --increment ${increment} --fixed-memory --device 0 \
+    --lr ${lr} --epochs ${epoch} --weight-decay ${wd} --ft_lr ${ft_lr} --ft_ep ${ft_ep} \
     --label cifar_${backbone}_inc_${increment} \
-    --data-path data | tee logs_output/resnet50_cifar_${method}_inc_${increment}.txt
+    --data-path data
