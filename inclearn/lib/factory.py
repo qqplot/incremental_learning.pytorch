@@ -73,7 +73,8 @@ def get_model(args):
         "podnet": models.PODNet,
         "lwm": models.LwM,
         "zil": models.ZIL,
-        "gdumb": models.GDumb
+        "gdumb": models.GDumb,
+        "pretrained": models.Pretrained
     }
 
     model = args["model"].lower()

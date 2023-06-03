@@ -93,4 +93,9 @@ def get_parser():
     parser.add_argument("--no-benchmark", action="store_true", default=False)
     parser.add_argument("--detect-anomaly", action="store_true", default=False)
 
+    # ------------------------------------------------------------------------------------------
+    # For Orthogonal Method
+    parser.add_argument("--ft_lr", default=0.01, type=float, help="lr for finetuning")
+    parser.add_argument("--ft_ep", default=20, type=int, help="epoch for finetuning")
+
     return parser
