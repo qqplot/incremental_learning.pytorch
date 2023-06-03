@@ -13,3 +13,5 @@ notebooks/
 .ipynb_checkpoints
 /logs_output
 /exps
+
+/options/*/*test*
