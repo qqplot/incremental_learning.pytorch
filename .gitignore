@@ -12,6 +12,6 @@ notebooks/
 .vscode
 .ipynb_checkpoints
 /logs_output
-/exps
+/exps/*tuning*
 
 /options/*/*test*

@@ -10,7 +10,11 @@ do
 for wd in 0.0005 0.0001
 do
 
-python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_resnet50.yaml options/data/cifar100_1order.yaml --initial-increment 50 --increment ${increment} --fixed-memory --device ${device_id} --lr ${lr} --weight-decay ${wd} --label tuning_cifar_${method}_inc_${increment}_lr_${lr}_wd_${wd} --data-path data --save-model task
+python3 -m inclearn --options options/podnet/podnet_${method}_cifar100_resnet50.yaml options/data/cifar100_1order.yaml \
+    --initial-increment 50 --increment ${increment} --fixed-memory \
+    --device ${device_id} --lr ${lr} --weight-decay ${wd} \
+    --label tuning_cifar_${method}_inc_${increment}_lr_${lr}_wd_${wd} \
+    --data-path data
 
 done
 done
