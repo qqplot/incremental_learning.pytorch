@@ -105,6 +105,11 @@ class Pretrained(ICarl):
             return self._memory_size // self._total_n_classes
         return self._memory_size // self._n_classes
 
+    def _before_task(self, train_loader, val_loader):
+        self._n_classes += self._task_size
+        self._network.add_classes(self._task_size)
+        logger.info("Now {} examplars per class.".format(self._memory_per_class))
+
     def _train_task(self, train_loader, val_loader):
         # Base things
         if self._meta_transfer:
@@ -129,7 +134,7 @@ class Pretrained(ICarl):
 
         self._network.train_dummy()
 
-        parameters = self._network.classifier.parameters()
+        parameters = self._network.dummy_classifier.parameters()
 
         self._optimizer = factory.get_optimizer(
             parameters, self._opt_name, self._finetuning_config["lr"], self.weight_decay
@@ -146,6 +151,13 @@ class Pretrained(ICarl):
         # ----------------------------------------------------------------------
         # Train projection
         self._network.train_projection()
+        parameters = self._network.model.parameters()
+        self._optimizer = factory.get_optimizer(
+            parameters, self._opt_name, self._lr, self._weight_decay
+        )
+        self._scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            self._optimizer, self._scheduling, gamma=self._lr_decay
+        )
         self._training_projection(
             train_loader, 
             val_loader, 
