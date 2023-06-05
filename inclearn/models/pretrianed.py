@@ -393,6 +393,19 @@ class Pretrained(ICarl):
                 if self._early_stopping and self._early_stopping["patience"] > wait:
                     logger.warning("Early stopping!")
                     break
+        
+            # --------------------------------------------------------------------------------
+            # This is added for debugging
+            pretty_metrics = ", ".join(
+                "{}: {}".format(metric_name, round(metric_value / (nb_epochs-initial_epoch), 3))
+                for metric_name, metric_value in self._metrics.items()
+            )
+            logger.info(
+                "T{}/{}, E{}/{} => {}".format(
+                    self._task + 1, self._n_tasks, epoch + 1, nb_epochs, pretty_metrics
+                )
+            )
+            # --------------------------------------------------------------------------------
 
         if self._eval_every_x_epochs:
             logger.info("Best accuracy reached at epoch {} with {}%.".format(best_epoch, best_acc))
