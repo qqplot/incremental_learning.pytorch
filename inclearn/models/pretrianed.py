@@ -74,6 +74,7 @@ class Pretrained(ICarl):
             postprocessor_kwargs=args.get("postprocessor_config", {}),
             device=self._device
         )
+        self.k_orth = args["k_orth"]
 
         self._examplars = {}
         self._means = None
@@ -140,7 +141,7 @@ class Pretrained(ICarl):
             parameters, self._opt_name, self._finetuning_config["lr"], self.weight_decay
         )
         self._scheduler = None
-        self._training_step(
+        self._training_dummy(
             train_loader,
             val_loader,
             0,
@@ -185,7 +186,7 @@ class Pretrained(ICarl):
             parameters, self._opt_name, self._finetuning_config["lr"], self.weight_decay
         )
         self._scheduler = None
-        self._training_step(
+        self._training_classifier(
             loader,
             val_loader,
             self._finetuning_config["epochs"] + self._n_epochs,
@@ -221,7 +222,7 @@ class Pretrained(ICarl):
         else:
             super()._after_task(inc_dataset)
 
-    def _eval_task(self, test_loader):
+    def _eval_task(self, test_loader, val_mode=False):
         if self._evaluation_type in ("icarl", "nme"):
             return super()._eval_task(test_loader)
         elif self._evaluation_type in ("softmax", "cnn"):
@@ -234,7 +235,10 @@ class Pretrained(ICarl):
                 inputs = input_dict["inputs"].to(self._device)
                 logits = self._network(inputs)["logits"].detach()
 
-                preds = F.softmax(logits, dim=-1)
+                if val_mode:
+                    preds = torch.argmax(logits, dim=-1)
+                else:
+                    preds = F.softmax(logits, dim=-1)
                 ypred.append(preds.cpu().numpy())
 
             ypred = np.concatenate(ypred)
@@ -306,6 +310,94 @@ class Pretrained(ICarl):
         else:
             self._class_weights = None
 
+    def _training_dummy(
+        self, train_loader, val_loader, initial_epoch, nb_epochs, record_bn=True, clipper=None
+    ):
+        best_epoch, best_acc = -1, -1.
+        wait = 0
+
+        grad, act = None, None
+        if len(self._multiple_devices) > 1:
+            logger.info("Duplicating model on {} gpus.".format(len(self._multiple_devices)))
+            training_network = nn.DataParallel(self._network, self._multiple_devices)
+            if self._network.gradcam_hook:
+                grad, act, back_hook, for_hook = hook.get_gradcam_hook(training_network)
+                training_network.module.convnet.last_conv.register_backward_hook(back_hook)
+                training_network.module.convnet.last_conv.register_forward_hook(for_hook)
+        else:
+            training_network = self._network
+
+        for epoch in range(initial_epoch, nb_epochs):
+            self._metrics = collections.defaultdict(float)
+
+            self._epoch_percent = epoch / (nb_epochs - initial_epoch)
+
+            if epoch == nb_epochs - 1 and record_bn and len(self._multiple_devices) == 1 and \
+               hasattr(training_network.convnet, "record_mode"):
+                logger.info("Recording BN means & vars for MCBN...")
+                training_network.convnet.clear_records()
+                training_network.convnet.record_mode()
+
+            prog_bar = tqdm(
+                train_loader,
+                disable=self._disable_progressbar,
+                ascii=True,
+                bar_format="{desc}: {percentage:3.0f}% | {n_fmt}/{total_fmt} | {rate_fmt}{postfix}"
+            )
+            for i, input_dict in enumerate(prog_bar, start=1):
+                inputs, targets = input_dict["inputs"], input_dict["targets"]
+                memory_flags = input_dict["memory_flags"]
+
+                if grad is not None:
+                    _clean_list(grad)
+                    _clean_list(act)
+
+                self._optimizer.zero_grad()
+                loss = self._forward_loss(
+                    training_network,
+                    inputs,
+                    targets,
+                    memory_flags,
+                    gradcam_grad=grad,
+                    gradcam_act=act
+                )
+                loss.backward()
+                self._optimizer.step()
+
+                if clipper:
+                    training_network.apply(clipper)
+
+                self._print_metrics(prog_bar, epoch, nb_epochs, i)
+
+            if self._scheduler:
+                self._scheduler.step(epoch)
+        
+            # --------------------------------------------------------------------------------
+            # This is added for debugging
+            pretty_metrics = ", ".join(
+                "{}: {}".format(metric_name, round(metric_value / (nb_epochs-initial_epoch), 3))
+                for metric_name, metric_value in self._metrics.items()
+            )
+            logger.info(
+                "T{}/{}, E{}/{} => {}".format(
+                    self._task + 1, self._n_tasks, epoch + 1, nb_epochs, pretty_metrics
+                )
+            )
+            # --------------------------------------------------------------------------------
+
+        # Evaluation step
+        self._network.eval()
+        self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
+            self.inc_dataset, self._herding_indexes
+        )
+        ytrue, ypred = self._eval_task(val_loader, val_mode=True)
+        acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
+        logger.info("Val accuracy for dummy training: {}".format(acc))
+        self._network.train()
+
+        if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
+            training_network.convnet.normal_mode()
+
     def _training_projection(
         self, train_loader, val_loader, initial_epoch, nb_epochs, record_bn=True, clipper=None
     ):
@@ -363,7 +455,9 @@ class Pretrained(ICarl):
                 # Projection step
                 Q,R = torch.linalg.qr(self._network.projection.T)
                 orthogonalized_projection = (Q * torch.diag(R)).T
-                self._network._new_projection = nn.Parameter(orthogonalized_projection[-1*self._network._last_n_classes:,:])
+                self._network._new_projection = nn.Parameter(
+                    orthogonalized_projection[-1*self._network._last_n_classes*self.k_orth:,:]
+                )
 
                 if clipper:
                     training_network.apply(clipper)
@@ -372,27 +466,6 @@ class Pretrained(ICarl):
 
             if self._scheduler_projection:
                 self._scheduler_projection.step(epoch)
-
-            if self._eval_every_x_epochs and epoch != 0 and epoch % self._eval_every_x_epochs == 0:
-                self._network.eval()
-                self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
-                    self.inc_dataset, self._herding_indexes
-                )
-                ytrue, ypred = self._eval_task(val_loader)
-                acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
-                logger.info("Val accuracy: {}".format(acc))
-                self._network.train()
-
-                if acc > best_acc:
-                    best_epoch = epoch
-                    best_acc = acc
-                    wait = 0
-                else:
-                    wait += 1
-
-                if self._early_stopping and self._early_stopping["patience"] > wait:
-                    logger.warning("Early stopping!")
-                    break
         
             # --------------------------------------------------------------------------------
             # This is added for debugging
@@ -407,8 +480,103 @@ class Pretrained(ICarl):
             )
             # --------------------------------------------------------------------------------
 
-        if self._eval_every_x_epochs:
-            logger.info("Best accuracy reached at epoch {} with {}%.".format(best_epoch, best_acc))
+        # Evaluation step
+        self._network.eval()
+        self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
+            self.inc_dataset, self._herding_indexes
+        )
+        ytrue, ypred = self._eval_task(val_loader, val_mode=True)
+        acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
+        logger.info("Val accuracy for orthogonal training: {}".format(acc))
+        self._network.train()
+        
+        if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
+            training_network.convnet.normal_mode()
+    
+    def _training_classifier(
+        self, train_loader, val_loader, initial_epoch, nb_epochs, record_bn=True, clipper=None
+    ):
+        best_epoch, best_acc = -1, -1.
+        wait = 0
+
+        grad, act = None, None
+        if len(self._multiple_devices) > 1:
+            logger.info("Duplicating model on {} gpus.".format(len(self._multiple_devices)))
+            training_network = nn.DataParallel(self._network, self._multiple_devices)
+            if self._network.gradcam_hook:
+                grad, act, back_hook, for_hook = hook.get_gradcam_hook(training_network)
+                training_network.module.convnet.last_conv.register_backward_hook(back_hook)
+                training_network.module.convnet.last_conv.register_forward_hook(for_hook)
+        else:
+            training_network = self._network
+
+        for epoch in range(initial_epoch, nb_epochs):
+            self._metrics = collections.defaultdict(float)
+
+            self._epoch_percent = epoch / (nb_epochs - initial_epoch)
+
+            if epoch == nb_epochs - 1 and record_bn and len(self._multiple_devices) == 1 and \
+               hasattr(training_network.convnet, "record_mode"):
+                logger.info("Recording BN means & vars for MCBN...")
+                training_network.convnet.clear_records()
+                training_network.convnet.record_mode()
+
+            prog_bar = tqdm(
+                train_loader,
+                disable=self._disable_progressbar,
+                ascii=True,
+                bar_format="{desc}: {percentage:3.0f}% | {n_fmt}/{total_fmt} | {rate_fmt}{postfix}"
+            )
+            for i, input_dict in enumerate(prog_bar, start=1):
+                inputs, targets = input_dict["inputs"], input_dict["targets"]
+                memory_flags = input_dict["memory_flags"]
+
+                if grad is not None:
+                    _clean_list(grad)
+                    _clean_list(act)
+
+                self._optimizer.zero_grad()
+                loss = self._forward_loss(
+                    training_network,
+                    inputs,
+                    targets,
+                    memory_flags,
+                    gradcam_grad=grad,
+                    gradcam_act=act
+                )
+                loss.backward()
+                self._optimizer.step()
+
+                if clipper:
+                    training_network.apply(clipper)
+
+                self._print_metrics(prog_bar, epoch, nb_epochs, i)
+
+            if self._scheduler:
+                self._scheduler.step(epoch)
+        
+            # --------------------------------------------------------------------------------
+            # This is added for debugging
+            pretty_metrics = ", ".join(
+                "{}: {}".format(metric_name, round(metric_value / (nb_epochs-initial_epoch), 3))
+                for metric_name, metric_value in self._metrics.items()
+            )
+            logger.info(
+                "T{}/{}, E{}/{} => {}".format(
+                    self._task + 1, self._n_tasks, epoch + 1, nb_epochs, pretty_metrics
+                )
+            )
+            # --------------------------------------------------------------------------------
+
+        # Evaluation step
+        self._network.eval()
+        self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
+            self.inc_dataset, self._herding_indexes
+        )
+        ytrue, ypred = self._eval_task(val_loader, val_mode=True)
+        acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
+        logger.info("Val accuracy for classifier training: {}".format(acc))
+        self._network.train()
 
         if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
             training_network.convnet.normal_mode()
