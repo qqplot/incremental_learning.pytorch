@@ -2,7 +2,7 @@ dataset: cifar100
 
 model: pretrained
 backbone_name: ViT-B/32
-k_orth: 1
+# k_orth: 1
 
 fixed_memory: true
 memory_size: 2000

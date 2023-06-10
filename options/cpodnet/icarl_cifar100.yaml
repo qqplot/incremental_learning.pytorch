@@ -5,16 +5,16 @@ model: icarl
 convnet: myclip
 convnet_config:
   clip_weight_name: RN50
-  clip_trainable: True
+  clip_trainable: False
 
-lr: 0.1
-weight_decay: 0.0005
+lr: 2.
+weight_decay: 0.00005
 # scheduling:
 #   - 49
 #   - 63
 # lr_decay: 0.2
 optimizer: sgd
-epochs: 10
+epochs: 1
 
 
 dataset_transforms:

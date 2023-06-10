@@ -148,6 +148,9 @@ class Pretrained(ICarl):
             self._finetuning_config["epochs"],
             record_bn=False
         )
+        
+        if self._args["debug_1"]:
+            return
 
         # ----------------------------------------------------------------------
         # Train projection
@@ -167,6 +170,9 @@ class Pretrained(ICarl):
             record_bn=True, 
             clipper=clipper
         )
+        
+        if self._args["debug_2"]:
+            return
 
         # ----------------------------------------------------------------------
         # Train classifier
@@ -193,6 +199,9 @@ class Pretrained(ICarl):
             2 * self._finetuning_config["epochs"] + self._n_epochs,
             record_bn=False
         )
+        
+        if self._args["debug_3"]:
+            return
 
     @property
     def weight_decay(self):
@@ -386,17 +395,18 @@ class Pretrained(ICarl):
             # --------------------------------------------------------------------------------
 
         # Evaluation step
-        self._network.eval()
-        self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
-            self.inc_dataset, self._herding_indexes
-        )
-        ytrue, ypred = self._eval_task(val_loader, val_mode=True)
-        acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
-        logger.info("Val accuracy for dummy training: {}".format(acc))
-        self._network.train()
+        if self._args["debug_1"] or self._args["full_track"]:
+            self._network.eval()
+            self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
+                self.inc_dataset, self._herding_indexes
+            )
+            ytrue, ypred = self._eval_task(val_loader, val_mode=True)
+            acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
+            logger.info("Val accuracy for dummy training: {}".format(acc))
+            self._network.train()
 
-        if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
-            training_network.convnet.normal_mode()
+            if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
+                training_network.convnet.normal_mode()
 
     def _training_projection(
         self, train_loader, val_loader, initial_epoch, nb_epochs, record_bn=True, clipper=None
@@ -481,17 +491,18 @@ class Pretrained(ICarl):
             # --------------------------------------------------------------------------------
 
         # Evaluation step
-        self._network.eval()
-        self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
-            self.inc_dataset, self._herding_indexes
-        )
-        ytrue, ypred = self._eval_task(val_loader, val_mode=True)
-        acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
-        logger.info("Val accuracy for orthogonal training: {}".format(acc))
-        self._network.train()
-        
-        if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
-            training_network.convnet.normal_mode()
+        if self._args["debug_2"] or self._args["full_track"]:
+            self._network.eval()
+            self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
+                self.inc_dataset, self._herding_indexes
+            )
+            ytrue, ypred = self._eval_task(val_loader, val_mode=True)
+            acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
+            logger.info("Val accuracy for orthogonal training: {}".format(acc))
+            self._network.train()
+            
+            if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
+                training_network.convnet.normal_mode()
     
     def _training_classifier(
         self, train_loader, val_loader, initial_epoch, nb_epochs, record_bn=True, clipper=None
@@ -569,17 +580,18 @@ class Pretrained(ICarl):
             # --------------------------------------------------------------------------------
 
         # Evaluation step
-        self._network.eval()
-        self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
-            self.inc_dataset, self._herding_indexes
-        )
-        ytrue, ypred = self._eval_task(val_loader, val_mode=True)
-        acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
-        logger.info("Val accuracy for classifier training: {}".format(acc))
-        self._network.train()
+        if self._args["debug_3"] or self._args["full_track"]:
+            self._network.eval()
+            self._data_memory, self._targets_memory, self._herding_indexes, self._class_means = self.build_examplars(
+                self.inc_dataset, self._herding_indexes
+            )
+            ytrue, ypred = self._eval_task(val_loader, val_mode=True)
+            acc = 100 * round((ypred == ytrue).sum() / len(ytrue), 3)
+            logger.info("Val accuracy for classifier training: {}".format(acc))
+            self._network.train()
 
-        if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
-            training_network.convnet.normal_mode()
+            if len(self._multiple_devices) == 1 and hasattr(training_network.convnet, "record_mode"):
+                training_network.convnet.normal_mode()
 
     def _compute_loss(self, inputs, outputs, targets, onehot_targets, memory_flags):
         features, logits, atts = outputs["raw_features"], outputs["logits"], outputs["attention"]

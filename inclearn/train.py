@@ -122,6 +122,10 @@ def _train(args, start_date, class_order, run_id):
         # -------------
         _train_task(args, model, train_loader, val_loader, test_loader, run_id, task_id, task_info)
 
+        # Added for debugging
+        if args["debug_1"] or args["debug_2"] or args["debug_3"]:
+            return
+
         # ----------------
         # 3. Conclude Task
         # ----------------

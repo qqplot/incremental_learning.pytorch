@@ -97,5 +97,13 @@ def get_parser():
     # For Orthogonal Method
     parser.add_argument("--ft_lr", default=0.01, type=float, help="lr for finetuning")
     parser.add_argument("--ft_ep", default=20, type=int, help="epoch for finetuning")
+    parser.add_argument("--k_orth", default=1, type=int, help="hyperparameter for orthogonal mapping")
+
+    # ------------------------------------------------------------------------------------------
+    # For Debug
+    parser.add_argument("--debug_1", action="store_true", default=False)
+    parser.add_argument("--debug_2", action="store_true", default=False)
+    parser.add_argument("--debug_3", action="store_true", default=False)
+    parser.add_argument("--full_track", action="store_true", default=False)
 
     return parser

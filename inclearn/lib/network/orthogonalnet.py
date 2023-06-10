@@ -109,6 +109,7 @@ class OrthogonalNet(nn.Module):
                 self._old_projection = self._new_projection
             self._old_projection.requires_grad = False
         self._new_projection = nn.Parameter(torch.randn(n_classes*self.k_orth, self.out_dim))
+        logger.info(f"{n_classes*self.k_orth} new otrhonormal bias added.")
 
         self.classifier.add_classes(n_classes)
         # self.dummy_classifier = Classifier(self.out_dim, device=self.device)

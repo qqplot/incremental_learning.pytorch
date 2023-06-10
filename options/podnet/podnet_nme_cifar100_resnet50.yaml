@@ -2,6 +2,8 @@ dataset: cifar100
 
 model: podnet
 convnet: resnet50
+convnet_config:
+  pretrained: True
 
 memory_size: 2000
 fixed_memory: true
