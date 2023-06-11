@@ -1,0 +1,54 @@
+dataset: cifar100
+
+model: pretrained2
+backbone_name: RN50
+k_orth: 1
+
+fixed_memory: true
+memory_size: 2000
+
+eval_type: cnn
+
+classifier_config:
+  type: fc
+  proxy_per_class: 10
+  distance: neg_stable_cosine_distance
+
+postprocessor_config:
+  type: learned_scaling
+  initial_value: 1.0
+
+nca:
+  margin: 0.6
+  scale: 1.
+  exclude_pos_denominator: true
+
+finetuning_config:
+  sampling: undersampling
+  tuning: classifier
+  # lr: 0.05
+  # epochs: 20
+  scaling: null
+
+# Cosine Scheduling (CS)
+# scheduling: cosine
+
+# Multi step LR Scheduler
+# scheduling:
+#   type: step
+#   epochs: [80,120]
+
+# Misc
+# epochs: 100
+# lr: 0.01
+lr_decay: 0.1
+optimizer: sgd
+proxy_per_class: 1
+# weight_decay: 0.01
+
+weight_generation:
+  type: imprinted
+  multi_class_diff: kmeans
+
+dataset_transforms:
+  clip: true

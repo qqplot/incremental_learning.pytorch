@@ -9,3 +9,4 @@ from .podnet import PODNet
 from .ucir import UCIR
 from .zil import ZIL
 from .pretrianed import Pretrained
+from .pretrianed2 import Pretrained2

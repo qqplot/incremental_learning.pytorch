@@ -6,3 +6,4 @@ from .classifiers import *
 from .postprocessors import *
 from .word import *
 from .orthogonalnet import *
+from .orthogonalnet2 import *

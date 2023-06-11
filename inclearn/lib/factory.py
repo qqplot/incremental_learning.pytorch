@@ -74,7 +74,8 @@ def get_model(args):
         "lwm": models.LwM,
         "zil": models.ZIL,
         "gdumb": models.GDumb,
-        "pretrained": models.Pretrained
+        "pretrained": models.Pretrained,
+        "pretrained2": models.Pretrained2
     }
 
     model = args["model"].lower()

@@ -14,7 +14,7 @@ from .word import Word2vec
 logger = logging.getLogger(__name__)
 
 
-class OrthogonalNet(nn.Module):
+class OrthogonalNet2(nn.Module):
     """
     
     github: https://github.com/openai/CLIP
@@ -30,7 +30,7 @@ class OrthogonalNet(nn.Module):
         device=None,
         **kwargs
     ):
-        super(OrthogonalNet, self).__init__()
+        super(OrthogonalNet2, self).__init__()
 
         if postprocessor_kwargs.get("type") == "learned_scaling":
             self.post_processor = FactorScalar(**postprocessor_kwargs)
@@ -100,18 +100,19 @@ class OrthogonalNet(nn.Module):
 
         return outputs
 
-    def add_classes(self, n_classes):
+    def add_classes(self, n_classes, proj_add=False):
         self._last_n_classes = n_classes
-        if self._new_projection is not None:
-            if self._old_projection is not None:
-                self._old_projection = nn.Parameter(torch.cat([self._old_projection, self._new_projection]))
-            else:
-                self._old_projection = self._new_projection
-            self._old_projection.requires_grad = False
-        new_param = torch.randn(n_classes*self.k_orth, self.out_dim)
-        new_param_normalized = torch.nn.functional.normalize(new_param, dim=1)
-        self._new_projection = nn.Parameter(new_param_normalized)
-        logger.info(f"{n_classes*self.k_orth} new otrhonormal bias added.")
+        if proj_add:
+            if self._new_projection is not None:
+                if self._old_projection is not None:
+                    self._old_projection = nn.Parameter(torch.cat([self._old_projection, self._new_projection]))
+                else:
+                    self._old_projection = self._new_projection
+                self._old_projection.requires_grad = False
+            new_param = torch.randn(n_classes*self.k_orth, self.out_dim)
+            new_param_normalized = torch.nn.functional.normalize(new_param, dim=1)
+            self._new_projection = nn.Parameter(new_param_normalized)
+            logger.info(f"{n_classes*self.k_orth} new otrhonormal bias added.")
 
         self.classifier.add_classes(n_classes)
         # self.dummy_classifier = Classifier(self.out_dim, device=self.device)
