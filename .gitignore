@@ -15,3 +15,5 @@ notebooks/
 /exps/*tuning*
 
 /options/*/*test*
+
+/results_save

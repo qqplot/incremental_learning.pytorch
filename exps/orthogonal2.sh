@@ -1,4 +1,4 @@
-gpu_id=4
+gpu_id=8
 lr=0.01
 epoch=20
 wd=0.01
@@ -9,10 +9,10 @@ ft_ep=20
 k_orth=5
 
 backbone=vit
-increment=1
+increment=5
 
 CUDA_VISIBLE_DEVICES=${gpu_id} python3 -m inclearn \
-    --options options/pretrained2/pretrained_${backbone}_cifar100.yaml options/data/cifar100_3orders.yaml \
+    --options options/pretrained2/pretrained_${backbone}_cifar100.yaml options/data/cifar100_3orders_seed2.yaml \
     --initial-increment 50 --increment ${increment} --fixed-memory --device 0 \
     --lr ${lr} --epochs ${epoch} --weight-decay ${wd} --ft_lr ${ft_lr} --ft_ep ${ft_ep} --k_orth ${k_orth} \
     --label full2_inc${increment}_ep${epoch}_lr${lr}_wd${wd}-ft_ep${ft_ep}_lr${ft_lr}-k${k_orth} \
